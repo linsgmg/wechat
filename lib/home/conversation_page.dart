@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:wechat/constants.dart' show AppColors, AppStyle, Contants;
 import 'package:wechat/modal/conversation.dart'
     show Conversation, mockConversationS;
+enum Device{
+  MAC,WIN
+}
 
 class ConversationPage extends StatefulWidget {
   @override
@@ -9,13 +12,54 @@ class ConversationPage extends StatefulWidget {
 }
 
 class _ConversationPageState extends State<ConversationPage> {
+  const _ConversationPageState({this.device:Device.WIN}):assert(device!=null);
+
+  final Device device;
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          return Container(
+            child: _DeviceInfoItem(),
+          );
+        }
         return _ConversationItem(mockConversationS[index]);
       },
       itemCount: mockConversationS.length,
+    );
+  }
+}
+
+//设备登录信息
+class _DeviceInfoItem extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(left: 24, top: 10, bottom: 10, right: 24),
+      decoration: BoxDecoration(
+        color: Color(AppColors.AppBarColorText),
+        border: Border(
+            bottom: BorderSide(
+                width: Contants.DividerWidth,
+                color: Color(AppColors.DividerColor))),
+      ),
+      child: Row(
+        children: <Widget>[
+          Icon(
+            Icons.tv,
+            size: 24,
+          ),
+          Container(
+            width: 16,
+          ),
+          Text(
+            'Windows微信已登录',
+            style: AppStyle.DeviceInfoItemTextStyle,
+          )
+        ],
+      ),
     );
   }
 }
@@ -92,14 +136,16 @@ class _ConversationItem extends StatelessWidget {
         height: 8.0,
       )
     ];
-    if (conversation.isMute) {//勿扰模式图标--显示
+    if (conversation.isMute) {
+      //勿扰模式图标--显示
       _rightArea.add(Icon(
         IconData(0xe8d8, fontFamily: Contants.IconFontFamily),
         color: Color(AppColors.ConversationmuteIcon),
         size: Contants.ConversationMuteIconSize,
       ));
-    }else{
-       _rightArea.add(Icon(//勿扰模式图标--隐藏
+    } else {
+      _rightArea.add(Icon(
+        //勿扰模式图标--隐藏
         IconData(0xe8d8, fontFamily: Contants.IconFontFamily),
         color: Colors.transparent,
         size: Contants.ConversationMuteIconSize,
