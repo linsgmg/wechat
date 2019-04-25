@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wechat/constants.dart' show Contants;
 import 'package:wechat/constants.dart' show AppColors;
+import 'package:wechat/home/conversation_page.dart';
 
 enum ActionItems { CHAT, FRIEND, SCAN, PAYMENT, HELP }
 
@@ -14,9 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   List<NavigationIconView> _navigationViews;
   List<Widget> _pageViews = [
-    Container(
-      color: Colors.green,
-    ),
+    ConversationPage(),
     Container(
       color: Colors.yellow,
     ),
