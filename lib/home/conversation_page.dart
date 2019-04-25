@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wechat/constants.dart' show AppColors, AppStyle, Contants;
 import 'package:wechat/modal/conversation.dart'
-    show Conversation, mockConversationS;
-enum Device{
-  MAC,WIN
-}
+    show Conversation, ConversationPageData, Device;
 
 class ConversationPage extends StatefulWidget {
   @override
@@ -12,28 +9,40 @@ class ConversationPage extends StatefulWidget {
 }
 
 class _ConversationPageState extends State<ConversationPage> {
-  // const _ConversationPageState({this.device:Device.WIN}):assert(device!=null);
-
-  // final Device device;
-
+  final ConversationPageData data = ConversationPageData.mock();
   @override
   Widget build(BuildContext context) {
+    var mockConversationS = data.conversations;
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
           return Container(
-            child: _DeviceInfoItem(),
+            child: _DeviceInfoItem(
+              device: Device.MAC,
+            ),
           );
         }
-        return _ConversationItem(mockConversationS[index]);
+        return _ConversationItem(mockConversationS[index - 1]);
       },
-      itemCount: mockConversationS.length,
+      itemCount: mockConversationS.length + 1,
     );
   }
 }
 
 //设备登录信息
 class _DeviceInfoItem extends StatelessWidget {
+  const _DeviceInfoItem({this.device: Device.WIN}) : assert(device != null);
+
+  final Device device;
+
+  int get iconName {
+    return device == Device.WIN ? 0xebb1 : 0xe640;
+  }
+
+  String get deviceName {
+    return device == Device.WIN ? 'Windows' : 'Mac';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -48,14 +57,15 @@ class _DeviceInfoItem extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Icon(
-            Icons.tv,
-            size: 24,
+            IconData(this.iconName, fontFamily: Contants.IconFontFamily),
+            size: 24.0,
+            color: Color(AppColors.DeviceInfoItemIcon),
           ),
           Container(
             width: 16,
           ),
           Text(
-            'Windows微信已登录',
+            '$deviceName 微信已登录',
             style: AppStyle.DeviceInfoItemTextStyle,
           )
         ],

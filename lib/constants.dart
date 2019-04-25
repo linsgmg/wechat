@@ -19,6 +19,7 @@ class AppColors {
   static const ConversationmuteIcon=0xffd8d8d8;
   static const DeviceInfoItemBg=0xfff5f5f5;
   static const DeviceInfoItemText=0xff606062;
+  static const DeviceInfoItemIcon=0xff606062;
 }
 
 class AppStyle {
