@@ -12,9 +12,9 @@ class ConversationPage extends StatefulWidget {
 }
 
 class _ConversationPageState extends State<ConversationPage> {
-  const _ConversationPageState({this.device:Device.WIN}):assert(device!=null);
+  // const _ConversationPageState({this.device:Device.WIN}):assert(device!=null);
 
-  final Device device;
+  // final Device device;
 
   @override
   Widget build(BuildContext context) {
