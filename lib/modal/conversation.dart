@@ -45,7 +45,7 @@ class ConversationPageData {
   final List<Conversation> conversations;
 
   static mock() {
-    return ConversationPageData(device: null, conversations: mockConversationS);
+    return ConversationPageData(device: Device.WIN, conversations: mockConversationS);
   }
 
   static List<Conversation> mockConversationS = [

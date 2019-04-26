@@ -15,16 +15,22 @@ class _ConversationPageState extends State<ConversationPage> {
     var mockConversationS = data.conversations;
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
-        if (index == 0) {
-          return Container(
-            child: _DeviceInfoItem(
-              device: Device.MAC,
-            ),
-          );
+        if (data.device != null) {
+          if (index == 0) {
+            return Container(
+              child: _DeviceInfoItem(
+                device: data.device,
+              ),
+            );
+          }
+          return _ConversationItem(mockConversationS[index - 1]);
+        } else {
+          return _ConversationItem(mockConversationS[index]);
         }
-        return _ConversationItem(mockConversationS[index - 1]);
       },
-      itemCount: mockConversationS.length + 1,
+      itemCount: data.device != null
+          ? mockConversationS.length + 1
+          : mockConversationS.length,
     );
   }
 }

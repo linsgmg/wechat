@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wechat/constants.dart' show Contants;
 import 'package:wechat/constants.dart' show AppColors;
+import 'package:wechat/home/contacts_page.dart';
 import 'package:wechat/home/conversation_page.dart';
 
 enum ActionItems { CHAT, FRIEND, SCAN, PAYMENT, HELP }
@@ -16,9 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<NavigationIconView> _navigationViews;
   List<Widget> _pageViews = [
     ConversationPage(),
-    Container(
-      color: Colors.yellow,
-    ),
+    ContactsPage(),
     Container(
       color: Colors.pink,
     ),
@@ -80,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _currentIndex = index;
           _controller.animateToPage(
             _currentIndex,
-            duration: Duration(milliseconds: 100),
+            duration: Duration(milliseconds: 1),
             curve: Curves.easeInOut,
           );
         });

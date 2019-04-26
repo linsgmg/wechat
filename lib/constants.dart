@@ -6,6 +6,8 @@ class Contants {
   static const DividerWidth=1.0;
   static const UnReadMsgNotifyDotSize=20.0;
   static const ConversationMuteIconSize=18.0;
+  static const ContactAvatarSize=36.0;
+  static const IndexBarWidth=24.0;
 }
 
 class AppColors {
@@ -20,6 +22,8 @@ class AppColors {
   static const DeviceInfoItemBg=0xfff5f5f5;
   static const DeviceInfoItemText=0xff606062;
   static const DeviceInfoItemIcon=0xff606062;
+  static const ContactGroupTitleBg=0xffebebeb;
+  static const ContactGroupTitleText=0xff888888;
 }
 
 class AppStyle {
@@ -38,6 +42,10 @@ class AppStyle {
   static const DeviceInfoItemTextStyle = TextStyle(
     fontSize: 13.0,
     color: Color(AppColors.DeviceInfoItemText)
+  );
+  static const ContactGroupTitleTextStyle = TextStyle(
+    fontSize: 14.0,
+    color: Color(AppColors.ContactGroupTitleText)
   );
 }
 
