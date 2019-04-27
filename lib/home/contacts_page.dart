@@ -14,6 +14,9 @@ class _ContactsPageState extends State<ContactsPage> {
   final List<Contact> _contacts = [];
   Color _indexBarBg = Colors.transparent;
   ScrollController _scrollController;
+  final Map _letterPosMap = {
+    INDEX_BAR_WORDS[0]: 0.0,
+  };
 
   final List<ContactItem> _functionButtons = [
     ContactItem(
@@ -74,12 +77,15 @@ class _ContactsPageState extends State<ContactsPage> {
         child: Text(word),
       );
     }).toList();
+    var _totalPos = 0.0;
+
     return Stack(
       children: <Widget>[
         ListView.builder(
           controller: _scrollController,
           itemBuilder: (BuildContext context, int index) {
             if (index < _functionButtons.length) {
+              _totalPos += _functionButtons[0]._height(false);
               return _functionButtons[index];
             }
             int _contacctIndex = index - _functionButtons.length;
@@ -90,11 +96,18 @@ class _ContactsPageState extends State<ContactsPage> {
                     _contacts[_contacctIndex - 1].nameIndexLetter) {
               _isGroupTitle = false;
             }
-            return ContactItem(
+
+            final ContactItem _contactItem = ContactItem(
               avatar: _contact.avatar,
               title: _contact.name,
               groupTitle: _isGroupTitle ? _contact.nameIndexLetter : null,
             );
+
+            _totalPos += _contactItem._height(_isGroupTitle);
+            if(_isGroupTitle){
+              _letterPosMap[_contact.nameIndexLetter]=_totalPos;
+            }
+            return _contactItem;
           },
           itemCount: _contacts.length + _functionButtons.length,
         ),
@@ -109,7 +122,9 @@ class _ContactsPageState extends State<ContactsPage> {
               onVerticalDragDown: (DragDownDetails details) {
                 setState(() {
                   _indexBarBg = Colors.black26;
-                  _scrollController.animateTo(250.0,curve: Curves.easeIn,duration: Duration(milliseconds: 200));
+                  _scrollController.animateTo(250.0,
+                      curve: Curves.easeIn,
+                      duration: Duration(milliseconds: 200));
                 });
               },
               onVerticalDragEnd: (DragEndDetails details) {
@@ -138,6 +153,10 @@ class ContactItem extends StatelessWidget {
   final String title;
   final String groupTitle;
   final VoidCallback onPressed;
+
+  final MARGIN_VERTICAL = 10.0;
+  final GROUP_TITLE_HEIGHT = 24.0;
+
   const ContactItem(
       {@required this.avatar,
       @required this.title,
@@ -146,6 +165,17 @@ class ContactItem extends StatelessWidget {
 
   bool get _isAvatarFromNet {
     return this.avatar.startsWith('http') || this.avatar.startsWith('https');
+  }
+
+  double _height(bool hasGroupTitle) {
+    final _buttonHeight = MARGIN_VERTICAL * 2 +
+        Contants.ContactAvatarSize +
+        Contants.DividerWidth;
+    if (hasGroupTitle) {
+      return _buttonHeight + GROUP_TITLE_HEIGHT;
+    } else {
+      return _buttonHeight;
+    }
   }
 
   @override
@@ -180,7 +210,7 @@ class ContactItem extends StatelessWidget {
                   width: Contants.DividerWidth,
                   color: Color(AppColors.DividerColor)))),
       margin: EdgeInsets.only(left: 16.0),
-      padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+      padding: EdgeInsets.only(top: MARGIN_VERTICAL, bottom: MARGIN_VERTICAL),
       child: Row(
         children: <Widget>[
           _avatarIcon,
@@ -198,12 +228,11 @@ class ContactItem extends StatelessWidget {
       _itemBody = Column(
         children: <Widget>[
           Container(
+            height: GROUP_TITLE_HEIGHT,
             color: Color(AppColors.ContactGroupTitleBg),
             padding: EdgeInsets.only(
               left: 16.0,
               right: 16.0,
-              top: 4.0,
-              bottom: 4.0,
             ),
             child: Text(
               this.groupTitle,
