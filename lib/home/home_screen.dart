@@ -4,6 +4,7 @@ import 'package:wechat/constants.dart' show AppColors;
 import 'package:wechat/home/contacts_page.dart';
 import 'package:wechat/home/conversation_page.dart';
 import 'package:wechat/home/discover_page.dart';
+import 'package:wechat/home/funtion_page.dart';
 
 enum ActionItems { CHAT, FRIEND, SCAN, PAYMENT, HELP }
 
@@ -20,9 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ConversationPage(),
     ContactsPage(),
     DiscoverPage(),
-    Container(
-      color: Colors.blue,
-    ),
+    FuntionPage(),
   ];
   PageController _controller;
 
@@ -130,38 +129,41 @@ class _HomeScreenState extends State<HomeScreen> {
           //   ),
           //   onPressed: () {},
           // ),
-          PopupMenuButton(
-            icon: Icon(
-              Icons.add_circle_outline,
-              color: Colors.black,
+          Theme(
+            data: ThemeData(cardColor: Color(AppColors.AppBarColor)),
+            child: PopupMenuButton(
+              icon: Icon(
+                Icons.add_circle_outline,
+                color: Colors.black,
+              ),
+              onSelected: (value) {
+                print(value);
+              },
+              itemBuilder: (BuildContext context) {
+                return <PopupMenuItem<ActionItems>>[
+                  PopupMenuItem(
+                    child: _PopItem(0xe620, '发起群聊'),
+                    value: ActionItems.CHAT,
+                  ),
+                  PopupMenuItem(
+                    child: _PopItem(0xe601, '添加朋友'),
+                    value: ActionItems.FRIEND,
+                  ),
+                  PopupMenuItem(
+                    child: _PopItem(0xe609, '扫一扫'),
+                    value: ActionItems.SCAN,
+                  ),
+                  PopupMenuItem(
+                    child: _PopItem(0xe60d, '收付款'),
+                    value: ActionItems.PAYMENT,
+                  ),
+                  PopupMenuItem(
+                    child: _PopItem(0xe620, '帮助与反馈'),
+                    value: ActionItems.HELP,
+                  ),
+                ];
+              },
             ),
-            onSelected: (value) {
-              print(value);
-            },
-            itemBuilder: (BuildContext context) {
-              return <PopupMenuItem<ActionItems>>[
-                PopupMenuItem(
-                  child: _PopItem(0xe620, '发起群聊'),
-                  value: ActionItems.CHAT,
-                ),
-                PopupMenuItem(
-                  child: _PopItem(0xe601, '添加朋友'),
-                  value: ActionItems.FRIEND,
-                ),
-                PopupMenuItem(
-                  child: _PopItem(0xe609, '扫一扫'),
-                  value: ActionItems.SCAN,
-                ),
-                PopupMenuItem(
-                  child: _PopItem(0xe60d, '收付款'),
-                  value: ActionItems.PAYMENT,
-                ),
-                PopupMenuItem(
-                  child: _PopItem(0xe620, '帮助与反馈'),
-                  value: ActionItems.HELP,
-                ),
-              ];
-            },
           ),
           Container(
             width: 16.0,

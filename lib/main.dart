@@ -7,7 +7,7 @@ void main() => runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.light().copyWith(
         primaryColor: Color(AppColors.AppBarColor),
-        cardColor: Color(AppColors.AppBarColor),
+        cardColor: Color(AppColors.AppBarColorText),
       ),
       home: HomeScreen(),
     ));

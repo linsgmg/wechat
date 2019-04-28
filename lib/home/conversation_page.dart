@@ -168,47 +168,81 @@ class _ConversationItem extends StatelessWidget {
       ));
     }
 
-    return Container(
-      padding: EdgeInsets.all(10.0),
-      decoration: BoxDecoration(
-          color: Color(AppColors.AppBarColorText),
-          border: Border(
-              bottom: BorderSide(
-                  color: Color(AppColors.DividerColor),
-                  width: Contants.DividerWidth))),
-      child: Row(
-        children: <Widget>[
-          avatarContainer,
-          Container(
-            width: 10,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  conversation.title,
-                  style: AppStyle.TitleStyle,
+    var tapPos;
+
+    _showMenu(BuildContext context, Offset tapPos) {
+      final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+      final RelativeRect position = RelativeRect.fromLTRB(tapPos.dx, tapPos.dy,
+          overlay.size.width - tapPos.dx, overlay.size.height - tapPos.dy);
+      showMenu<String>(
+          context: context,
+          position: position,
+          items: <PopupMenuItem<String>>[
+            PopupMenuItem(child: Text('标为已读'), value: '标为已读'),
+            PopupMenuItem(child: Text('置顶聊天'), value: '置顶聊天'),
+            PopupMenuItem(child: Text('删除该聊天'), value: '删除该聊天'),
+          ]).then<String>((String selected) {
+        switch (selected) {
+          default:
+            print('当前选中的是：$selected');
+        }
+      });
+    }
+
+    return Material(
+      color: Color(AppColors.AppBarColorText),
+      child: InkWell(
+        onTap: () {
+          print('点击${conversation.title}');
+        },
+        onLongPress: () {
+          _showMenu(context, tapPos);
+        },
+        onTapDown: (TapDownDetails details){
+          tapPos=details.globalPosition;
+        },
+        child: Container(
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(
+                      color: Color(AppColors.DividerColor),
+                      width: Contants.DividerWidth))),
+          child: Row(
+            children: <Widget>[
+              avatarContainer,
+              Container(
+                width: 10,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      conversation.title,
+                      style: AppStyle.TitleStyle,
+                    ),
+                    Container(
+                      height: 8.0,
+                    ),
+                    Text(
+                      conversation.description,
+                      style: AppStyle.DesStyle,
+                    )
+                  ],
                 ),
-                Container(
-                  height: 8.0,
-                ),
-                Text(
-                  conversation.description,
-                  style: AppStyle.DesStyle,
-                )
-              ],
-            ),
+              ),
+              Container(
+                width: 10,
+              ),
+              Column(
+                // crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: _rightArea,
+              )
+            ],
           ),
-          Container(
-            width: 10,
-          ),
-          Column(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: _rightArea,
-          )
-        ],
+        ),
       ),
     );
   }
