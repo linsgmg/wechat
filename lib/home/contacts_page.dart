@@ -17,6 +17,7 @@ class _ContactsPageState extends State<ContactsPage> {
   final Map _letterPosMap = {
     INDEX_BAR_WORDS[0]: 0.0,
   };
+  String _currentLetter = '';
 
   final List<ContactItem> _functionButtons = [
     ContactItem(
@@ -59,8 +60,23 @@ class _ContactsPageState extends State<ContactsPage> {
       ..addAll(data.contacts);
     _contacts.sort((Contact a, Contact b) =>
         a.nameIndexLetter.compareTo(b.nameIndexLetter));
-
     _scrollController = ScrollController();
+    //计算用于IndexBar进行定位的通讯录列表项的位置
+    var _totalPos = _functionButtons.length * ContactItem._height(false);
+    for (var i = 0; i < _contacts.length; i++) {
+      bool _hasGroupTitle = true;
+      if (i > 0 &&
+          _contacts[i]
+                  .nameIndexLetter
+                  .compareTo(_contacts[i - 1].nameIndexLetter) ==
+              0) {
+        _hasGroupTitle = false;
+      }
+      if (_hasGroupTitle) {
+        _letterPosMap[_contacts[i].nameIndexLetter] = _totalPos;
+      }
+      _totalPos += ContactItem._height(_hasGroupTitle);
+    }
   }
 
   @override
@@ -70,80 +86,133 @@ class _ContactsPageState extends State<ContactsPage> {
     _scrollController.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  String getLetter(BuildContext context, double tileHeight, Offset globalPos) {
+    RenderBox _box = context.findRenderObject();
+    var local = _box.globalToLocal(globalPos);
+    var index = (local.dy ~/ tileHeight).clamp(0, INDEX_BAR_WORDS.length - 1);
+    print(index);
+    return INDEX_BAR_WORDS[index];
+  }
+
+  void _jumpToIndex(String letter) {
+    if (_letterPosMap.isNotEmpty) {
+      final _pos = _letterPosMap[letter];
+      if (_pos != null) {
+        _scrollController.animateTo(_pos,
+            curve: Curves.easeIn, duration: Duration(milliseconds: 200));
+      }
+    }
+  }
+
+  Widget _buildIndexBar(BuildContext context, BoxConstraints constraints) {
     final List<Widget> _letters = INDEX_BAR_WORDS.map((String word) {
       return Expanded(
         child: Text(word),
       );
     }).toList();
-    var _totalPos = 0.0;
 
-    return Stack(
-      children: <Widget>[
-        ListView.builder(
-          controller: _scrollController,
-          itemBuilder: (BuildContext context, int index) {
-            if (index < _functionButtons.length) {
-              _totalPos += _functionButtons[0]._height(false);
-              return _functionButtons[index];
-            }
-            int _contacctIndex = index - _functionButtons.length;
-            Contact _contact = _contacts[_contacctIndex];
-            bool _isGroupTitle = true;
-            if (_contacctIndex >= 1 &&
-                _contact.nameIndexLetter ==
-                    _contacts[_contacctIndex - 1].nameIndexLetter) {
-              _isGroupTitle = false;
-            }
+    final _totalHeight = constraints.biggest.height;
+    final _tileeHeight = _totalHeight / _letters.length;
+    // print(_totalHeight);
+    // print(_tileeHeight);
 
-            final ContactItem _contactItem = ContactItem(
-              avatar: _contact.avatar,
-              title: _contact.name,
-              groupTitle: _isGroupTitle ? _contact.nameIndexLetter : null,
-            );
-
-            _totalPos += _contactItem._height(_isGroupTitle);
-            if(_isGroupTitle){
-              _letterPosMap[_contact.nameIndexLetter]=_totalPos;
-            }
-            return _contactItem;
-          },
-          itemCount: _contacts.length + _functionButtons.length,
+    return Container(
+      color: _indexBarBg,
+      child: GestureDetector(
+        onVerticalDragDown: (DragDownDetails details) {
+          setState(() {
+            _indexBarBg = Colors.black26;
+            // print(details.globalPosition);
+            _currentLetter =
+                getLetter(context, _tileeHeight, details.globalPosition);
+            _jumpToIndex(_currentLetter);
+          });
+        },
+        onVerticalDragEnd: (DragEndDetails details) {
+          setState(() {
+            _indexBarBg = Colors.transparent;
+            _currentLetter='';
+          });
+        },
+        onVerticalDragCancel: () {
+          setState(() {
+            _indexBarBg = Colors.transparent;
+            _currentLetter='';
+          });
+        },
+        onVerticalDragUpdate: (DragUpdateDetails details) {
+          setState(() {
+            _currentLetter =
+                getLetter(context, _tileeHeight, details.globalPosition);
+            _jumpToIndex(_currentLetter);
+          });
+        },
+        child: Column(
+          children: _letters,
         ),
-        Positioned(
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> _body = [
+      ListView.builder(
+        controller: _scrollController,
+        itemBuilder: (BuildContext context, int index) {
+          if (index < _functionButtons.length) {
+            return _functionButtons[index];
+          }
+          int _contacctIndex = index - _functionButtons.length;
+          Contact _contact = _contacts[_contacctIndex];
+          bool _isGroupTitle = true;
+          if (_contacctIndex >= 1 &&
+              _contact.nameIndexLetter ==
+                  _contacts[_contacctIndex - 1].nameIndexLetter) {
+            _isGroupTitle = false;
+          }
+
+          final ContactItem _contactItem = ContactItem(
+            avatar: _contact.avatar,
+            title: _contact.name,
+            groupTitle: _isGroupTitle ? _contact.nameIndexLetter : null,
+          );
+
+          return _contactItem;
+        },
+        itemCount: _contacts.length + _functionButtons.length,
+      ),
+      Positioned(
           width: Contants.IndexBarWidth,
           right: 0.0,
           top: 0.0,
           bottom: 0.0,
-          child: Container(
-            color: _indexBarBg,
-            child: GestureDetector(
-              onVerticalDragDown: (DragDownDetails details) {
-                setState(() {
-                  _indexBarBg = Colors.black26;
-                  _scrollController.animateTo(250.0,
-                      curve: Curves.easeIn,
-                      duration: Duration(milliseconds: 200));
-                });
-              },
-              onVerticalDragEnd: (DragEndDetails details) {
-                setState(() {
-                  _indexBarBg = Colors.transparent;
-                });
-              },
-              onVerticalDragCancel: () {
-                setState(() {
-                  _indexBarBg = Colors.transparent;
-                });
-              },
-              child: Column(
-                children: _letters,
-              ),
+          child: LayoutBuilder(
+            builder: _buildIndexBar,
+          )),
+    ];
+
+    if (_currentLetter != null && _currentLetter.isNotEmpty) {
+      _body.add(Center(
+        child: Container(
+          width: Contants.IndexLetterBoxSize,
+          height: Contants.IndexLetterBoxSize,
+          decoration: BoxDecoration(
+            color: AppColors.IndexLetterBoxGg,
+            borderRadius: BorderRadius.all(
+                Radius.circular(Contants.IndexLetterBoxRadius)),
+          ),
+          child: Center(
+            child: Text(
+              _currentLetter,
+              style: AppStyle.IndexLetterBoxTextStyle,
             ),
           ),
-        )
-      ],
+        ),
+      ));
+    }
+    return Stack(
+      children: _body,
     );
   }
 }
@@ -154,8 +223,8 @@ class ContactItem extends StatelessWidget {
   final String groupTitle;
   final VoidCallback onPressed;
 
-  final MARGIN_VERTICAL = 10.0;
-  final GROUP_TITLE_HEIGHT = 24.0;
+  static const MARGIN_VERTICAL = 10.0;
+  static const GROUP_TITLE_HEIGHT = 24.0;
 
   const ContactItem(
       {@required this.avatar,
@@ -167,7 +236,7 @@ class ContactItem extends StatelessWidget {
     return this.avatar.startsWith('http') || this.avatar.startsWith('https');
   }
 
-  double _height(bool hasGroupTitle) {
+  static double _height(bool hasGroupTitle) {
     final _buttonHeight = MARGIN_VERTICAL * 2 +
         Contants.ContactAvatarSize +
         Contants.DividerWidth;

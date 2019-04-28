@@ -3,6 +3,7 @@ import 'package:wechat/constants.dart' show Contants;
 import 'package:wechat/constants.dart' show AppColors;
 import 'package:wechat/home/contacts_page.dart';
 import 'package:wechat/home/conversation_page.dart';
+import 'package:wechat/home/discover_page.dart';
 
 enum ActionItems { CHAT, FRIEND, SCAN, PAYMENT, HELP }
 
@@ -18,9 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _pageViews = [
     ConversationPage(),
     ContactsPage(),
-    Container(
-      color: Colors.pink,
-    ),
+    DiscoverPage(),
     Container(
       color: Colors.blue,
     ),
